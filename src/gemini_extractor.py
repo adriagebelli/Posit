@@ -16,23 +16,22 @@ def process_input_with_gemini(input_data: dict) -> DailyJournalEntry:
     client = genai.Client(api_key=GEMINI_API_KEY)
     
     prompt = (
-        "Analitza aquest missatge o nota de veu de journaling nocturn d'un estudiant d'enginyeria. "
-        "Fes una transcripció íntegra o netejada del text (full_transcription), "
-        "redacta un resum breu (summary), destaca la victòria o èxit del dia (daily_win), "
-        "puntuació l'estat d'ànim de l'1 al 5 (mood), l'energia de l'1 al 5 (energy), "
-        "i assigna etiquetes rellevants en català com ara Entrenament, Projectes, Universitat, Social o Descans (tags)."
+        "Analitza aquesta reflexió diària (ja sigui text escrit o transcripció d'àudio) de Pòsit. "
+        "Estructura el resultat segons l'esquema sol·licitat: "
+        "Fes un resum executiu (summary), extreu la victòria o èxit del dia (daily_win), "
+        "puntua l'estat d'ànim de l'1 al 5 (mood), l'energia de l'1 al 5 (energy), "
+        "assigna etiquetes rellevants en català (ex: Entrenament, Productivitat, Universitat, Hàbits, Descans) (tags), "
+        "i neteja o adjunta el text sencer (full_transcription)."
     )
 
     contents = []
 
     if input_data["type"] == "voice":
-        # Pugem el fitxer d'àudio temporalment a Gemini File API
         audio_file_ref = client.files.upload(file=input_data["path"])
         contents = [audio_file_ref, prompt]
     else:
         contents = [f"Text de l'usuari: {input_data['content']}", prompt]
 
-    # Crida estructurada amb gemini-2.5-flash
     response = client.models.generate_content(
         model='gemini-2.5-flash',
         contents=contents,
@@ -43,5 +42,4 @@ def process_input_with_gemini(input_data: dict) -> DailyJournalEntry:
         ),
     )
 
-    # El SDK retorna un objecte estructurat directament validat per Pydantic gràcies a response.parsed
     return response.parsed
