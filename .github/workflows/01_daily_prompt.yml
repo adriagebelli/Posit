@@ -1,0 +1,21 @@
+name: 01 Send Daily Prompt
+on:
+  schedule:
+    # 21:00 UTC equival a les 22:00 CET
+    - cron: '0 21 * * *'
+  workflow_dispatch:
+
+jobs:
+  prompt:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install -r requirements.txt
+      - name: Send prompt via Telegram
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: python main.py --mode prompt
