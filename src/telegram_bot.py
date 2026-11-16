@@ -31,7 +31,7 @@ def _save_offset(offset: int):
 
 def get_unprocessed_updates():
     """
-    Retorna el contingut del darrer missatge o nota de veu pendent (text o fitxer .ogg descarregat).
+    Recull missatges de text o notes de veu de Telegram de manera flexible.
     """
     offset = _get_saved_offset()
     url = f"{BASE_URL}/getUpdates"
@@ -44,44 +44,42 @@ def get_unprocessed_updates():
     if not results:
         return None
 
-    # Agafem l'última actualització
     update = results[-1]
     update_id = update["update_id"]
-    
-    # Guardem el nou offset per marcar-ho com a llegit la propera vegada (+1)
     _save_offset(update_id + 1)
 
     message = update.get("message", {})
     chat_id = str(message.get("chat", {}).get("id", ""))
 
-    # Assegurem que el missatge ve del nostre xat autoritzat
     if chat_id != str(TELEGRAM_CHAT_ID):
         return None
 
-    # Comprovem si conté nota de veu o àudio
+    # Si l'usuari ha enviat una nota de veu
     if "voice" in message:
         file_id = message["voice"]["file_id"]
         file_path = _download_telegram_file(file_id, "voice.ogg")
         return {"type": "voice", "path": file_path}
     
-    # Comprovem si conté text pla
+    # Si l'usuari ha escrit text lliure
     elif "text" in message:
         return {"type": "text", "content": message["text"]}
 
     return None
 
 def _download_telegram_file(file_id: str, output_filename: str) -> str:
-    # 1. Demanar la ruta del fitxer a Telegram
     file_info_url = f"{BASE_URL}/getFile"
     r = requests.get(file_info_url, params={"file_id": file_id})
     r.raise_for_status()
     file_path_in_telegram = r.json()["result"]["file_path"]
 
-    # 2. Descarregar el binari
     download_url = f"https://api.telegram.org/file/bot{TELEGRAM_BOT_TOKEN}/{file_path_in_telegram}"
     file_res = requests.get(download_url)
     file_res.raise_for_status()
 
+    with open(output_filename, "wb") as f:
+        f.write(file_res.content)
+
+    return output_filename
     with open(output_filename, "wb") as f:
         f.write(file_res.content)
 
