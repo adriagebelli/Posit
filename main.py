@@ -18,26 +18,26 @@ def main():
         # Generem un missatge dinàmic i fresc cada nit amb Gemini
         client = genai.Client(api_key=GEMINI_API_KEY)
         response = client.models.generate_content(
-    model="gemini-3.8-flash",
-    contents=(
-        "Escriu el missatge nocturn de journaling de Pòsit, en català estàndard i "
-        "amb ortografia i gramàtica impecables.\n\n"
-        "Requisits:\n"
-        "- Adreça't a la persona amb un to proper, natural i respectuós.\n"
-        "- Fes una pregunta principal concreta i oberta, no una pregunta genèrica "
-        "com «Com ha anat el dia?».\n"
-        "- Afegeix com a màxim dues preguntes breus per aprofundir.\n"
-        "- Tria un focus per al missatge: estat d'ànim i energia, activitat física, "
-        "estudi o feina, hàbits o una petita victòria del dia. No intentis cobrir-ho tot.\n"
-        "- Convida a explicar un moment o exemple concret d'avui.\n"
-        "- No inventis informació sobre la persona ni repeteixis idees amb altres paraules.\n"
-        "- Recorda que pot respondre amb text o amb una nota de veu.\n"
-        "- Retorna només el missatge final, revisat, sense explicacions ni etiquetes."
-    ),
-    config=types.GenerateContentConfig(temperature=0.3),
-)
+            model="gemini-3.8-flash",
+            contents=(
+                "Escriu el missatge nocturn de journaling de Pòsit, en català estàndard i "
+                "amb ortografia i gramàtica impecables.\n\n"
+                "Requisits:\n"
+                "- Adreça't a la persona amb un to proper, natural i respectuós.\n"
+                "- Fes una pregunta principal concreta i oberta, no una pregunta genèrica "
+                "com «Com ha anat el dia?».\n"
+                "- Afegeix com a màxim dues preguntes breus per aprofundir.\n"
+                "- Tria un focus per al missatge: estat d'ànim i energia, activitat física, "
+                "estudi o feina, hàbits o una petita victòria del dia. No intentis cobrir-ho tot.\n"
+                "- Convida a explicar un moment o exemple concret d'avui.\n"
+                "- No inventis informació sobre la persona ni repeteixis idees amb altres paraules.\n"
+                "- Recorda que pot respondre amb text o amb una nota de veu.\n"
+                "- Retorna només el missatge final, revisat, sense explicacions ni etiquetes."
+            ),
+            config=types.GenerateContentConfig(temperature=0.3),
+        )
 
-dynamic_prompt = (response.text or "").strip()
+        dynamic_prompt = (response.text or "").strip()
         
         send_message(f"☕ *Pòsit de la nit*\n\n{dynamic_prompt}")
 
