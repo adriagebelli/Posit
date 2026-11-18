@@ -17,7 +17,7 @@ def main():
         # Generem un missatge dinàmic i fresc cada nit amb Gemini
         client = genai.Client(api_key=GEMINI_API_KEY)
         dynamic_prompt = client.models.generate_content(
-            model='gemini-2.5-flash',
+            model='gemini-3.5-flash',
             contents=(
                 "Genera un missatge breu en català per a Telegram per iniciar el journaling nocturn de Pòsit. "
                 "El missatge ha de ser motivador, proper i no avorrit. Ha de convidar a reflexionar de manera natural "
