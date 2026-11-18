@@ -1,7 +1,6 @@
 name: 02 Ingest Journal Response
 on:
   schedule:
-    # 01:00 UTC (02:00 CET)
     - cron: '0 1 * * *'
   workflow_dispatch:
 
