@@ -10,7 +10,6 @@ def send_message(text: str):
     payload = {
         "chat_id": TELEGRAM_CHAT_ID,
         "text": text,
-        "parse_mode": "Markdown"
     }
     response = requests.post(url, json=payload)
     response.raise_for_status()
