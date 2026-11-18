@@ -33,7 +33,7 @@ def process_input_with_gemini(input_data: dict) -> DailyJournalEntry:
         contents = [f"Text de l'usuari: {input_data['content']}", prompt]
 
     response = client.models.generate_content(
-        model='gemini-3.6-flash',
+        model='gemini-3.5-flash-lite',
         contents=contents,
         config=types.GenerateContentConfig(
             response_mime_type="application/json",
