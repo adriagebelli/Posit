@@ -39,7 +39,7 @@ def main():
 
         dynamic_prompt = (response.text or "").strip()
         
-        send_message(f"☕ *Pòsit de la nit*\n\n{dynamic_prompt}")
+        send_message(f"☕ Pòsit d'avui\n\n{dynamic_prompt}")
 
     elif args.mode == "ingest":
         update = get_unprocessed_updates()
