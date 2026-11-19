@@ -7,7 +7,7 @@ NOTION_API_KEY = os.getenv("NOTION_API_KEY")
 NOTION_DAILY_DB_ID = os.getenv("NOTION_DAILY_DB_ID")
 NOTION_WEEKLY_DB_ID = os.getenv("NOTION_WEEKLY_DB_ID")
 
-# Posa aquí el model exacte que et funciona actualment
+# Mantén aquí el nom exacte del model que et funciona actualment
 GEMINI_MODEL = "gemini-3.8-flash"
 
 def validate_config():
