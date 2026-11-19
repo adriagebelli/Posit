@@ -8,7 +8,7 @@ NOTION_DAILY_DB_ID = os.getenv("NOTION_DAILY_DB_ID")
 NOTION_WEEKLY_DB_ID = os.getenv("NOTION_WEEKLY_DB_ID")
 
 # Posa aquí el model exacte que et funciona actualment
-GEMINI_MODEL = "gemini-3.5-flash-lite"
+GEMINI_MODEL = "gemini-3.8-flash"
 
 def validate_config():
     missing = []
