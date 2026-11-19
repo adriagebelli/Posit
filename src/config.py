@@ -7,6 +7,9 @@ NOTION_API_KEY = os.getenv("NOTION_API_KEY")
 NOTION_DAILY_DB_ID = os.getenv("NOTION_DAILY_DB_ID")
 NOTION_WEEKLY_DB_ID = os.getenv("NOTION_WEEKLY_DB_ID")
 
+# Posa aquí el model exacte que et funciona actualment
+GEMINI_MODEL = "gemini-3.5-flash-lite"
+
 def validate_config():
     missing = []
     if not TELEGRAM_BOT_TOKEN: missing.append("TELEGRAM_BOT_TOKEN")
