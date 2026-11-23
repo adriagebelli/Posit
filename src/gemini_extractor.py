@@ -20,7 +20,7 @@ def process_input_with_gemini(input_data: dict) -> DailyJournalEntry:
 
     prompt = (
         "Analitza aquesta reflexió nocturna (text o nota de veu) de Pòsit i extreu les dades segons l'esquema JSON en català estàndard sense faltes d'ortografia:\n"
-        "- summary: Resum executiu del dia en 2-3 frases.\n"
+        "- summary: Resum complet i detallat del dia, sense límit de frases ni de caràcters, recollint tots els temes i matisos importants que s'han comentat.\n"
         "- daily_win: La victòria o assoliment principal del dia.\n"
         "- mood: Estat d'ànim de l'1 al 5.\n"
         "- energy: Nivell d'energia de l'1 al 5.\n"
