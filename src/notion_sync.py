@@ -2,6 +2,7 @@ from notion_client import Client
 from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 from src.config import NOTION_API_KEY, NOTION_DAILY_DB_ID, NOTION_WEEKLY_DB_ID
+import requests
 
 notion = Client(auth=NOTION_API_KEY)
 
@@ -95,17 +96,26 @@ def get_last_7_days_entries():
     now = datetime.now(ZoneInfo("Europe/Madrid"))
     seven_days_ago = (now - timedelta(days=7)).strftime("%Y-%m-%d")
 
-    response = notion.databases.query(
-        database_id=NOTION_DAILY_DB_ID,
-        filter={
+    url = f"https://api.notion.com/v1/databases/{NOTION_DAILY_DB_ID}/query"
+    headers = {
+        "Authorization": f"Bearer {NOTION_API_KEY}",
+        "Notion-Version": "2022-06-28",
+        "Content-Type": "application/json"
+    }
+    payload = {
+        "filter": {
             "property": "Data",
             "date": {
                 "on_or_after": seven_days_ago
             }
         },
-        sorts=[{"property": "Data", "direction": "descending"}],
-        page_size=14
-    )
+        "sorts": [{"property": "Data", "direction": "descending"}],
+        "page_size": 14
+    }
+
+    res = requests.post(url, headers=headers, json=payload)
+    res.raise_for_status()
+    response = res.json()
 
     entries_text = []
     alarm_fails = 0
@@ -143,7 +153,6 @@ def get_last_7_days_entries():
         "bed_fails": bed_fails,
         "days_with_any_fail": days_with_any_fail
     }
-
 def create_weekly_review_entry(synthesis_text: str, week_title: str, habit_summary: str):
     now = datetime.now(ZoneInfo("Europe/Madrid"))
     new_page = notion.pages.create(
