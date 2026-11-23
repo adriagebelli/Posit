@@ -9,17 +9,27 @@ DIES_CATALA = ["Dilluns", "Dimarts", "Dimecres", "Dijous", "Divendres", "Dissabt
 
 def create_daily_entry(data):
     now = datetime.now(ZoneInfo("Europe/Madrid"))
-    nom_dia = DIES_CATALA[now.weekday()]
-    today_str = f"{now.strftime('%Y-%m-%d')} - {nom_dia}"
+    
+    # Si s'executa de matinada (abans de les 8:00 h), l'entrada correspon al dia anterior
+    if now.hour < 8:
+        entry_date = now - timedelta(days=1)
+    else:
+        entry_date = now
+
+    nom_dia = DIES_CATALA[entry_date.weekday()]
+    # Títol en format DD/MM/AAAA - Dia (ex: 22/11/2026 - Diumenge)
+    title_str = f"{entry_date.strftime('%d/%m/%Y')} - {nom_dia}"
+    # Format ISO obligatori per a la columna de tipus Date de Notion
+    iso_date = entry_date.strftime("%Y-%m-%d")
 
     new_page = notion.pages.create(
         parent={"database_id": NOTION_DAILY_DB_ID},
         properties={
             "Nom": {
-                "title": [{"text": {"content": today_str}}]
+                "title": [{"text": {"content": title_str}}]
             },
             "Data": {
-                "date": {"start": now.strftime("%Y-%m-%d")}
+                "date": {"start": iso_date}
             },
             "Victòria del dia": {
                 "rich_text": [{"text": {"content": data.daily_win[:2000]}}]
@@ -73,79 +83,5 @@ def create_daily_entry(data):
                 }
             }
         ]
-    )
-    return new_page.get("url")
-
-def get_last_7_days_entries():
-    now = datetime.now(ZoneInfo("Europe/Madrid"))
-    seven_days_ago = (now - timedelta(days=7)).strftime("%Y-%m-%d")
-
-    response = notion.databases.query(
-        database_id=NOTION_DAILY_DB_ID,
-        filter={
-            "property": "Data",
-            "date": {
-                "on_or_after": seven_days_ago
-            }
-        },
-        sorts=[{"property": "Data", "direction": "descending"}],
-        page_size=14
-    )
-
-    entries_text = []
-    alarm_fails = 0
-    bed_fails = 0
-    days_with_any_fail = 0
-
-    for page in response.get("results", []):
-        props = page["properties"]
-        try:
-            date = props["Data"]["date"]["start"] if props.get("Data", {}).get("date") else "Sense data"
-            summary = props["Resum breu"]["rich_text"][0]["text"]["content"] if props.get("Resum breu", {}).get("rich_text") else ""
-            win = props["Victòria del dia"]["rich_text"][0]["text"]["content"] if props.get("Victòria del dia", {}).get("rich_text") else ""
-
-            no_snooze = props.get("Alarma a la 1a", {}).get("checkbox", False)
-            bed_made = props.get("Llit fet", {}).get("checkbox", False)
-
-            if not no_snooze:
-                alarm_fails += 1
-            if not bed_made:
-                bed_fails += 1
-            if not no_snooze or not bed_made:
-                days_with_any_fail += 1
-
-            entries_text.append(
-                f"Data: {date} | Alarma a la 1a: {'Sí' if no_snooze else 'FALLAT'} | "
-                f"Llit fet: {'Sí' if bed_made else 'FALLAT'} | Resum: {summary} | Victòria: {win}"
-            )
-        except Exception:
-            continue
-
-    return {
-        "text": "\n".join(entries_text),
-        "total_days": len(entries_text),
-        "alarm_fails": alarm_fails,
-        "bed_fails": bed_fails,
-        "days_with_any_fail": days_with_any_fail
-    }
-
-def create_weekly_review_entry(synthesis_text: str, week_title: str, habit_summary: str):
-    now = datetime.now(ZoneInfo("Europe/Madrid"))
-    new_page = notion.pages.create(
-        parent={"database_id": NOTION_WEEKLY_DB_ID},
-        properties={
-            "Setmana": {
-                "title": [{"text": {"content": week_title}}]
-            },
-            "Rang de dates": {
-                "date": {"start": now.strftime("%Y-%m-%d")}
-            },
-            "Patró detectat": {
-                "rich_text": [{"text": {"content": habit_summary[:2000]}}]
-            },
-            "Accions Clau": {
-                "rich_text": [{"text": {"content": synthesis_text[:2000]}}]
-            }
-        }
     )
     return new_page.get("url")
